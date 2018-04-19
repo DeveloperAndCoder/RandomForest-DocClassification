@@ -50,4 +50,7 @@ The main module is in HVP-RF-DocClass.cpp
 		
 To link opencv with codeblocks visit this page:
 	https://kevinhughes.ca/tutorials/opencv-install-on-windows-with-codeblocks-and-mingw 
+	
+Download table_dataset from:
+	https://lampsrv02.umiacs.umd.edu/projdb/project.php?id=72
 		
