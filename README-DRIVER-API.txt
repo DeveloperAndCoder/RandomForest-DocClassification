@@ -48,6 +48,6 @@ The main module is in HVP-RF-DocClass.cpp
 		
 		
 		
-		
-		
+To link opencv with codeblocks visit this page:
+	https://kevinhughes.ca/tutorials/opencv-install-on-windows-with-codeblocks-and-mingw 
 		
