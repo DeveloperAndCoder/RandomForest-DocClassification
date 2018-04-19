@@ -1,6 +1,6 @@
 
-#include <cv.h>       // opencv general include file
-#include <ml.h>		  // opencv machine learning include file
+#include <C:\opencv\build\include\opencv\cv.h>       // opencv general include file
+#include <C:\opencv\build\include\opencv\ml.h>		  // opencv machine learning include file
 
 
 #include <stdio.h>
@@ -26,7 +26,7 @@ class RandForestTrainTest{
 	Mat testing_data;
 	CvRTParams params;
 	int row_sample;
-	vector<double> accuracy; 
+	vector<double> accuracy;
 	vector<int> class_count;
 	vector <vector<int>> class_index;
 	CvRTrees* rtree;
@@ -45,6 +45,7 @@ public:
 	{
 		numFeat = nFeat;
 	}
+
 	double TrainTestRF(vector<int> trainIndex, vector<int> testIndex, Mat data,Mat training_classifications);
 	int read_data(const char* filename );
 	//int read_data_class(const char* filename);

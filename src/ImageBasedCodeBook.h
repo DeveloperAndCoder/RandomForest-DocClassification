@@ -21,7 +21,7 @@ using namespace std;
 class ImageBasedCodeBook
 {
 	Mat points;
-	CvSeq* imageKeypoints; 
+	CvSeq* imageKeypoints;
 	CvSeq* imageDescriptors;
 	Mat labels;
 	Mat centers;
@@ -31,9 +31,9 @@ class ImageBasedCodeBook
 	unsigned int max_flag;
 public:
 	ImageBasedCodeBook()
-	{	
+	{
 		offset = 0;
-		max_sample = 10000;
+		max_sample = 1000000;
 		max_flag = 0;
 
 	}
@@ -43,31 +43,25 @@ public:
 
 int ImageBasedCodeBook::addDescMatrix( const CvSeq* model_keypoints, const CvSeq* model_descriptors, int descSize)
 {
-    int length = (int)(model_descriptors->elem_size/sizeof(float));
-    int i,j;
-	if ( offset < max_sample)
+    if ( offset < max_sample)
 		points.resize(offset + model_descriptors->total,0); // resize the matrix, add more rows
 	else
 	{
 		max_flag = 1;
 		return 0;
 	}
-
-    CvSeqReader reader, kreader;
+    CvSeqReader reader;
     cvStartReadSeq( model_descriptors, &reader, 0 );
-	
-    for( i = 0; i < model_descriptors->total; i++ )
+
+    for( int i = 0; i < model_descriptors->total; i++ )
     {
         const float* mvec = (const float*)reader.ptr;
 		//copy the vector into matrix
-		 for( j = 0; j < descSize; j++ )
-		 {
-			 points.at<float>(i + offset,j) = mvec[j]; 
-			 //cout<<mvec[j]<<" ";
-		 }
-		CV_NEXT_SEQ_ELEM( reader.seq->elem_size, reader );	 
+		for( int j = 0; j < descSize; j++ )
+		 	 points.at<float>(i + offset,j) = mvec[j];
+        CV_NEXT_SEQ_ELEM( reader.seq->elem_size, reader );
 	}
-	offset = offset + model_descriptors->total;
+	offset += model_descriptors->total;
     return 0;
 }
 
@@ -81,38 +75,34 @@ int ImageBasedCodeBook::CreateCodeBook(const char* image_filename, const char* c
 	inputFile.open (image_filename); // file containing images names
 	IplImage* image ;
 	cv::initModule_nonfree();
-	CvMemStorage* storage = cvCreateMemStorage(0);
-	CvSURFParams params = cvSURFParams(8000, 0); // 0 for 64 dimensional, 1 for 128 dimensional
-	//Only first 10,000 points will be given for clustering, so pre-allocating
+	CvSURFParams params = cvSURFParams(5000, 0); // 0 for 64 dimensional
 	points = Mat(1,64,CV_32F);
-	int attempts = 3;
+	int i = 0;
 	while (inputFile >> fname)
 	{
+	    i++;
 		cout<<fname;
 		image = cvLoadImage( fname.c_str(), CV_LOAD_IMAGE_GRAYSCALE );
 		if(!image )
-		{
 			fprintf( stderr, "Can not load %s\n", fname.c_str());
-			//exit(-1);
-		}		
-		//double tt = (double)cvGetTickCount();
-		cvExtractSURF( image, 0, &imageKeypoints, &imageDescriptors, storage, params );
+
+        CvMemStorage* storage = cvCreateMemStorage(0);
+		cvExtractSURF( image, 0, &imageKeypoints, &imageDescriptors, storage, params ); //extracting key-points and descriptors
 		printf("\nObject Descriptors: %d\n", imageDescriptors->total);
-		//tt = (double)cvGetTickCount() - tt;
-		//int clusterCount = 100;
 		addDescMatrix( imageKeypoints, imageDescriptors);
+		cvClearMemStorage(storage);
+		cvReleaseMemStorage(&storage);  //deallocation
+		cvReleaseImage(&image); //deallocation
 		if (max_flag == 1)
-			break;
+            break;
 	}
-	
+
+    cout << "\n\nImages loaded = " << i << endl;
 	labels = Mat(offset, 1, CV_32SC1 );
 	centers = Mat(clusterCount,64,CV_32F);
-	kmeans(points, clusterCount, labels, cv::TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 0.0001, 10000), attempts, cv::KMEANS_PP_CENTERS,centers );
-	//cvKMeans2(points, clusterCount, clusters, cvTermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 1, 2));
 
-	for (int j =0; j <  imageDescriptors->total;j++ )
-		cout<<labels.at<int>(j)<<"\t";
-	//write centers to a file
+	kmeans(points, clusterCount, labels, cv::TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 0.0001, 10000), attempts, cv::KMEANS_PP_CENTERS,centers );
+
 	std::ofstream file(codebook_filename);
 	  if (file.is_open())
 	  {
@@ -124,7 +114,7 @@ int ImageBasedCodeBook::CreateCodeBook(const char* image_filename, const char* c
 				  file << " ";
 			  }
 			  file << "\n";
-		  } 
+		  }
 	  }
 	  file.close();
 	  return 0;

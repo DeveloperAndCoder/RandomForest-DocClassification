@@ -1,7 +1,3 @@
-// Implementation of Horizontal-Vertical partitioning class for structural similarity based document classification
-// Main program for selecting from different alternatives: codebook creation, training, cross-validation, proximity computation
-// Author: Jayant Kumar, jayant@umiacs.umd.edu
-
 #include "HVPartitionRFC.h"
 #include "ImageBasedCodeBook.h"
 #include "RandForestTrain.h"
@@ -17,24 +13,46 @@ void help();
 
 int main(int argc, char** argv)
 {
-
+    //ios_base::sync_with_stdio(false);
+    //cin.tie(nullptr);
+    //cout.tie(nullptr);
 	int i=0;
-	//argc = 7;
-	//argv[1] = "2";
-	//const char* image_filename =  "C:\\Users\\jayant\\LAMP\\grouping\\TableImageInCLass.txt";
-	//argv[2] =  "C:\\Users\\USX26430\\Xerox_work\\CPPcode\\DocClass\\zip\\jfeat.txt"; // for codebook 
-	//argv[3] = "\\TIDCodeBook.txt";
-	//const char* testimage_filename = "C:\\Users\\jayant\\LAMP\\grouping\\TableImageTest.txt";
-	//argv[2] = "C:\\Users\\USX26430\\Xerox_work\\Data\\AlignBasedResults\\TIDImageHVPFeatures.txt";
-	//argv[3] = "6"; argv[4] = "1300"; argv[5] = "2"; argv[6] = "1";
- 	//argv[3] = "C:\\Users\\USX26430\\Xerox_work\\Data\\AlignBasedResults\\RFmodelTID.txt";
-	//argv[5] = "2600";
-	//const char* prox_filename = "C:\\Users\\jayant\\LAMP\\grouping\\ProximityTableData.txt";
-	//ImageBasedCodeBook iBC;
-	//iBC.CreateCodeBook(image_filename, codebook_filename, 100);
-	//argc = 6;
-	
-	if (argc < 3)
+	argc = 7;
+
+	/*  argv[1] = "0";
+        argv[2] =  "C:\\Users\\chinmay\\Desktop\\image2.txt";
+        argv[3] = "C:\\Users\\chinmay\\Desktop\\codebook.txt";
+        argv[4] = "100";
+    */
+
+	/*  argv[1] = "1";
+        argv[2] =  "C:\\Users\\chinmay\\Desktop\\image_class.txt";
+        argv[3] = "C:\\Users\\chinmay\\Desktop\\codebook.txt";
+        argv[4] = "C:\\Users\\chinmay\\Desktop\\test_feat_temp.txt";
+        argv[5] = "100";    argv[6] = "64";
+    */
+
+	/*  argv[1] = "2";
+        argv[2] = "C:\\Users\\chinmay\\Desktop\\test_feat_temp.txt";
+        argv[3] = "594"; 	argv[4] = "1300";
+        argv[5] = "2"; argv[6] = "150";
+    */
+
+    /*  argv[1] = "3";
+        argv[2] = "C:\\Users\\chinmay\\Desktop\\test_feat_temp.txt";
+        argv[3] = "594"; 	argv[4] = "1300";
+        argv[5] = "2";
+        argv[6] = "C:\\Users\\chinmay\\Desktop\\model.txt";
+    */
+
+      argv[1] = "4";
+        argv[2] = "C:\\Users\\chinmay\\Desktop\\test.txt";
+        argv[3] = "C:\\Users\\chinmay\\Desktop\\model.txt";
+        argv[4] = "C:\\Users\\chinmay\\Desktop\\codebook.txt";
+        argv[5] = "1300";   argv[6] = "100";    argv[7] = "64";
+
+
+    if (argc < 3)
 	{
 		help();
 		exit(0);
@@ -42,7 +60,6 @@ int main(int argc, char** argv)
 
 	if (strcmp(argv[1] , "0")  == 0)
 	{
-		//CreateCodeBook(argv[2], argv[3]);
 		ImageBasedCodeBook iBC;
 		unsigned int NumCW = atoi(argv[4]); // number of codewords
 		iBC.CreateCodeBook(argv[2], argv[3], NumCW);
@@ -65,9 +82,10 @@ int main(int argc, char** argv)
 		unsigned int NumSamp = atoi(argv[3]);
 		unsigned int Numfeat = atoi(argv[4]);
 		unsigned int numTrain = atoi(argv[6]);
-		RandForestTrainTest rfT(NumSamp,Numfeat,NumClass); //Number of sample, number of features, number of classes is required 
+		//cout<<"output begins\n";
+		RandForestTrainTest rfT(NumSamp,Numfeat,NumClass); //Number of sample, number of features, number of classes is required
 		rfT.read_data(argv[2]);
-		if (numTrain >= 1) // numer of images per class for training
+		if (numTrain >= 1) // number of images per class for training
 			rfT.do_CrossValidation(numTrain);
 		else
 		{
@@ -81,8 +99,8 @@ int main(int argc, char** argv)
 		unsigned int NumClass = atoi(argv[5]);
 		unsigned int NumSamp = atoi(argv[3]);
 		unsigned int Numfeat = atoi(argv[4]);
-		RandForestTrainTest rfT(NumSamp,Numfeat, NumClass); //Number of sample, number of features, number of classes is required 
-		rfT.read_data(argv[2]);
+		RandForestTrainTest rfT(NumSamp,Numfeat, NumClass); //Number of sample, number of features, number of classes is required
+		rfT.read_data(argv[2]); //test_feat_temp.txt
 		rfT.TrainTestRF(argv[6]); // save the trained model using given file path
 	}
 	else if (strcmp(argv[1] , "4")  == 0)
@@ -93,36 +111,6 @@ int main(int argc, char** argv)
 		unsigned int descsize = atoi(argv[7]);// desc size 64 or 128
 		rfT.RFClassify(argv[2],argv[3],argv[4], NumCW, descsize); // testimage_filename,model_filename,codebook_filename
 	}
-	/*else
-	{
-		unsigned int NumClass = atoi(argv[5]);
-		unsigned int NumSamp = atoi(argv[3]);
-		unsigned int Numfeat = atoi(argv[4]);
-		RandForestTrainTest rfT(2*117,1300, 2); // Use twice the number of samples, No. of classes = 2
-		rfT.read_data(train_filename); // features have already been written but ignote the classes
-		rfT.create_aux_data(); // this fill up the aux data in feature matrix
-		rfT.ObtainProximity(); // train RF and obtain N x N proximity
-	}*/
-
-	//WriteTrainData(image_filename, train_filename, codebook_filename); //for writing features
-    
-	/*** Training RF using features written in a text file, each row contains 1 sample, columns in features, last column is class ****/
-
-	//RandForestTrainTest rfT(824,1300, 53); //Number of sample, number of features, number of classes is required 
-	//rfT.read_data(train_filename);
-	//rfT.do_CrossValidation(5);   // only cross validation for estimating accuracies 
-	//rfT.TrainTestRF(model_filename); // save the trained model using given file path
-	
-	/** Classify new images using saved model (model_filename), and saved codebook  **/
-	//RandForestTrainTest rfT(1300);
-	//rfT.RFClassify(testimage_filename,model_filename,codebook_filename);
-	
-	/** Create Auxilliary data, train RF, and obtain proximity for clustering  **/
-	/*RandForestTrainTest rfT(824,1300, 2, true); // Use twice the number of samples, No. of classes does not matter (give 2)
-	rfT.read_data(train_filename); // features have already been written but ignore the classes
-	rfT.create_aux_data(); // this fill up the aux data in feature matrix
-	rfT.ObtainProximity(prox_filename); // train RF and obtain N x N proximity, write the matrix to a file and run suitable scripts for clustering
-	*/
 	return 0;
 }
 
@@ -136,15 +124,14 @@ void help()
 		"./HVP-RF-UMDDocClass 2 train_feat_filename NumSamples NumFeatures NumClasses NumTrain=> For cross validation results \n"
 		"./HVP-RF-UMDDocClass 3 train_feat_filename NumSamples NumFeatures NumClasses model_filename => For training RF and saving model \n"
 		"./HVP-RF-UMDDocClass 4 testimage_filename model_filename codebook_filename NumFeatures NumCW Descsize => For classification of images\n"
-		"./HVP-RF-UMDDocClass 5 train_feat_filename proximity_filename => For creating aux. data, training RF for proximity, and writing proximity \n"
-		 );
+		);
     return;
 }
 
 
-//This is step before traning when for each image given in text file we extract features and write in a text file 
+//This is step before training when for each image given in text file we extract features and write in a text file
 //along with class (last column)
-int	WriteTrainData(const char* filename, const char *trainFname, const char *codebook_filename, unsigned int numCW, 
+int	WriteTrainData(const char* filename, const char *trainFname, const char *codebook_filename, unsigned int numCW,
 	unsigned int descSize)
 {
 	int i;
@@ -162,15 +149,14 @@ int	WriteTrainData(const char* filename, const char *trainFname, const char *cod
 			//split image name and class
 			std::vector<std::string> tokens;
 			istringstream iss(imagefilename);
-			copy(istream_iterator<string>(iss),istream_iterator<string>(),back_inserter<vector<string> >(tokens));	
-			
+			copy(istream_iterator<string>(iss),istream_iterator<string>(),back_inserter<vector<string> >(tokens));
+
 			std::cout << tokens[0] << std::endl;
 			float classvar = atof(tokens[1].c_str());
-
+            cout << "class variable = " << classvar << endl;
 			IplImage* image = cvLoadImage( tokens[0].c_str(), CV_LOAD_IMAGE_GRAYSCALE );// read image
 			if(!image )
 			{
-				//fprintf( stderr, "Can not load %s\n",scene_filename );
 				std::cout << "Error opening imagefile : " << imagefilename << std::endl;
 				return -1;
 			}
@@ -196,3 +182,4 @@ int	WriteTrainData(const char* filename, const char *trainFname, const char *cod
 	}
 	return 0;
 }
+

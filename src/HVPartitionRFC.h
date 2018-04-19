@@ -18,7 +18,7 @@
 #define CLASS_HVP
 
 
-class HVPartitionRFC 
+class HVPartitionRFC
 {
 	IplImage* image;	// image to be classified
 	int imHeight,imWidth;
@@ -26,24 +26,20 @@ class HVPartitionRFC
 	int numPartitions; //Total number of partitions
 	std::vector<int> cNumVector;
 	CvMemStorage* storage;
-	CvMat* points;	// N x D Matrix for descriptors of image 
+	CvMat* points;	// N x D Matrix for descriptors of image
 	CvMat *codeMat;	// K x D matrix for learned codebook
 	CvSeq* imageKeypoints;
-	CvSeq* imageDesc; 
-	int descSize;	// 64 or 128 
+	CvSeq* imageDesc;
+	int descSize;	// 64 or 128
 	std::vector <float> featHVP;
 	std:: vector<std::pair<float,float>> partitionBound1;
 	std:: vector<std::pair<float,float>> partitionBound2;
 public:
 	int ComputeHVPFeatures();
-	int GetUpdateIndices(int x, int y, std::vector<int> &);
 	int read_codebook(const char* codebook_filename,int numCW,int descSize);
 	int getDescMat( const CvSeq* model_keypoints, const CvSeq* model_descriptors, CvMat* points, int descSize );
 	int ObtainSURFDesc(int descSize);
-	int ObtainFREAKDesc(int size);
-	int FindNearestCodeWord(int index,float &);
 	int FindNearestCodeWordED(int index, float &mdist);
-	int UpdateHVPFeat(int cNum, int x, int y );
 	int ObtainPartition(int h,int v);
 	int ComputeHistFeatures(int index);
 	std::vector<float> getHistFeat();
@@ -52,7 +48,7 @@ public:
 		image = im;
 		imHeight = im->height;
 		imWidth = im->width;
-		imageKeypoints =0;
+		imageKeypoints = 0;
 		numPartitions = 0;
 		//compute number of partitions
 		for (int j=0; j < h ;j++)
@@ -67,6 +63,7 @@ public:
 			cvReleaseMat(&points);
 		if (codeMat != NULL)
 			cvReleaseMat(&codeMat);
+		cvClearMemStorage(storage);
 		cvReleaseMemStorage(&storage);
 	}
 };
